@@ -117,4 +117,4 @@ annotations/
 paper/submission/
 paper/*.pdf
 
-EOF
+EOF__pycache__/
