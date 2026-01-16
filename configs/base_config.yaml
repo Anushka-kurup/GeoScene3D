@@ -1,0 +1,29 @@
+model:
+  vlm:
+    name: "llava-hf/LLaVA-NeXT-Video-3B-hf"
+    freeze: true
+    lora:
+      enabled: true
+      r: 16
+      alpha: 32
+  
+  geometry:
+    # Option 1: Use local checkpoint
+    name: "checkpoints/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth"
+    # Option 2: Use HuggingFace
+    # name: "naver/DUSt3R_ViTLarge_BaseDecoder_512_dpt"
+    freeze: true
+    change_threshold: 0.1
+  
+  fusion:
+    visual_dim: 1024
+    geometry_dim: 512
+    hidden_dim: 4096
+  
+  verifier:
+    hidden_dim: 512
+  
+  num_process_stages: 8
+  hidden_dim: 4096
+
+# ... rest of config
