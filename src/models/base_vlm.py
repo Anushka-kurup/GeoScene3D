@@ -22,6 +22,7 @@ class BaseLLaVA(nn.Module):
         # Load pre-trained model
         self.model = LlavaNextVideoForConditionalGeneration.from_pretrained(
             config.name,
+            use_auth_token="geocar",
             torch_dtype=torch.float16,
             device_map="auto",
             low_cpu_mem_usage=True
