@@ -118,3 +118,4 @@ paper/submission/
 paper/*.pdf
 
 EOF__pycache__/
+__pycache__/
