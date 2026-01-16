@@ -1,6 +1,7 @@
 model:
   vlm:
-    name: "llava-hf/LLaVA-NeXT-Video-3B-hf"
+    name: "lmms-lab/LLaVA-NeXT-Video-7B"
+    token: "geocar"
     freeze: true
     lora:
       enabled: true
