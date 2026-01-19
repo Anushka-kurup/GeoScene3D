@@ -1,4 +1,5 @@
 import sys
+sys.path.insert(0, '/workspace/GeoScene3D/dust3r')
 sys.path.append('src')
 
 import torch
@@ -18,7 +19,6 @@ img_t2 = torch.randn(B, 3, 224, 224)
 question = "What changed?"
 
 output = model(img_t1, img_t2, question)
-
 
 print("Output:", output['text'])
 print("Confidence:", output['confidence'])

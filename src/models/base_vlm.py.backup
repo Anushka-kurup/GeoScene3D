@@ -101,7 +101,7 @@ class BaseLLaVA(nn.Module):
             question = [question]
         
         images = self._prepare_images(img_t1, img_t2)
-        prompts = [f"USER: {q}\nASSISTANT:" for q in question]  # No <image> for fallback
+        prompts = [f"USER: <image>\n<image>\n{q}\nASSISTANT:" for q in question]
         
         inputs = self.processor(
             text=prompts,

@@ -1,30 +1,21 @@
 model:
-  vlm:
-    name: "lmms-lab/LLaVA-NeXT-Video-7B"
-    token: "geocar"
-    freeze: true
-    lora:
-      enabled: true
-      r: 16
-      alpha: 32
-  
-  geometry:
-    # Option 1: Use local checkpoint
-    name: "checkpoints/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth"
-    # Option 2: Use HuggingFace
-    # name: "naver/DUSt3R_ViTLarge_BaseDecoder_512_dpt"
-    freeze: true
-    change_threshold: 0.1
-  
   fusion:
-    visual_dim: 1024
     geometry_dim: 512
     hidden_dim: 4096
-  
+    visual_dim: 1024
+  geometry:
+    change_threshold: 0.1
+    freeze: true
+    name: naver/DUSt3R_ViTLarge_BaseDecoder_512_linear
+  hidden_dim: 4096
+  num_process_stages: 8
   verifier:
     hidden_dim: 512
-  
-  num_process_stages: 8
-  hidden_dim: 4096
-
-# ... rest of config
+  vlm:
+    freeze: true
+    lora:
+      alpha: 32
+      enabled: true
+      r: 16
+    name: /workspace/.hf_home/hub/LLaVA-NeXT-Video-7B
+    token: geocar
