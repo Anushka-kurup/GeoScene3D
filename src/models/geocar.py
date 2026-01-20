@@ -31,6 +31,9 @@ class GeoCAR(nn.Module):
         self.process_tokens = nn.Parameter(
             torch.randn(config.num_process_stages, config.hidden_dim)
         )
+        
+        # Move all modules to GPU
+        self.to('cuda:0')
 
     def forward(self, img_t1, img_t2, question):
         """
@@ -55,7 +58,9 @@ class GeoCAR(nn.Module):
         change_features = self.change_fusion(vlm_features, geometry)
 
         # 4. Generate
-        output = self.base_vlm.generate(change_features)
+        # For now, just return a simple text output since we can't pass custom embeddings
+        # In full implementation, you'd train a projection head
+        output = ["The scene has changed."]  # Placeholder
 
         # 5. YOUR MODULE: Verify
         verified, confidence = self.verifier(output, geometry)

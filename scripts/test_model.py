@@ -10,7 +10,9 @@ from models.geocar import GeoCAR
 config = OmegaConf.load('configs/base_config.yaml')
 
 # Create model
+# Create model
 model = GeoCAR(config.model)
+model.eval()  # Set to evaluation mode
 
 # Test forward pass
 B = 1
@@ -18,7 +20,8 @@ img_t1 = torch.randn(B, 3, 224, 224)
 img_t2 = torch.randn(B, 3, 224, 224)
 question = "What changed?"
 
-output = model(img_t1, img_t2, question)
+with torch.no_grad():
+    output = model(img_t1, img_t2, question)
 
 print("Output:", output['text'])
 print("Confidence:", output['confidence'])

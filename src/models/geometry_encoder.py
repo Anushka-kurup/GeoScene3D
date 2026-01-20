@@ -192,7 +192,9 @@ else:
         @torch.no_grad()
         def forward(self, img_t1, img_t2):
             B, C, H, W = img_t1.shape
-            device = img_t1.device
+            device = 'cuda:0'  # Force GPU
+            img_t1 = img_t1.to(device)
+            img_t2 = img_t2.to(device)
 
             # Simple mock geometry
             diff = torch.abs(img_t2 - img_t1).mean(dim=1)
@@ -226,6 +228,7 @@ else:
 
             change_mask = (diff > 0.1).float()
 
+            
             return {
                 "pointmap_t1": pointmap_t1,
                 "pointmap_t2": pointmap_t2,

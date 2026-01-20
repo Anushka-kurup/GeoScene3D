@@ -63,6 +63,17 @@ class ChangeFusionModule(nn.Module):
             num_embeddings=4,  # additive, subtractive, transformative, none
             embedding_dim=geometry_dim,
         )
+        
+        # ═══════════════════════════════════════════════════
+        # Projection head: hidden_dim -> visual_dim for generation
+        # ═══════════════════════════════════════════════════
+        self.output_projection = nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.GELU(),
+            nn.LayerNorm(hidden_dim // 2),
+            nn.Dropout(0.1),
+            nn.Linear(hidden_dim // 2, visual_dim),
+        )
 
         print(
             f"ChangeFusionModule initialized: {self.count_parameters() / 1e6:.2f}M params"
@@ -91,13 +102,34 @@ class ChangeFusionModule(nn.Module):
 
         H, W = pointmap_t1.shape[1:3]
 
+        # Downsample to reduce memory (224x224 -> 28x28)
+        # Use adaptive pooling to reduce spatial dimensions
+        import torch.nn.functional as F
+        pool_size = 28  # Reduce from 224x224 to 28x28
+        
+        # Reshape for pooling: [B, H, W, 3] -> [B, 3, H, W]
+        points_t1_pooled = F.adaptive_avg_pool2d(
+            pointmap_t1.permute(0, 3, 1, 2), 
+            (pool_size, pool_size)
+        ).permute(0, 2, 3, 1)  # Back to [B, pool_size, pool_size, 3]
+        
+        points_t2_pooled = F.adaptive_avg_pool2d(
+            pointmap_t2.permute(0, 3, 1, 2), 
+            (pool_size, pool_size)
+        ).permute(0, 2, 3, 1)
+        
+        change_mask_pooled = F.adaptive_avg_pool2d(
+            change_mask.unsqueeze(1), 
+            (pool_size, pool_size)
+        ).squeeze(1)  # [B, pool_size, pool_size]
+        
         # Flatten spatial dimensions
-        points_t1 = pointmap_t1.reshape(B, H * W, 3)
-        points_t2 = pointmap_t2.reshape(B, H * W, 3)
-        change_mask_flat = change_mask.reshape(B, H * W)
+        points_t1 = points_t1_pooled.reshape(B, pool_size * pool_size, 3)
+        points_t2 = points_t2_pooled.reshape(B, pool_size * pool_size, 3)
+        change_mask_flat = change_mask_pooled.reshape(B, pool_size * pool_size)
 
         # Project to feature space
-        geo_feat_t1 = self.geo_projection(points_t1)  # [B, H*W, geo_dim]
+        geo_feat_t1 = self.geo_projection(points_t1)  # [B, pool_size^2, geo_dim]
         geo_feat_t2 = self.geo_projection(points_t2)
 
         # ═══════════════════════════════════════════════════

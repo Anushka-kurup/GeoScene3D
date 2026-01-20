@@ -17,13 +17,23 @@ class BaseLLaVA(nn.Module):
         
         print(f"Loading Molmo2 model: {config.name}")
         
-        # Load model
+        # Load model in float16 directly on GPU
+        print("Loading model on GPU...")
         self.model = AutoModelForImageTextToText.from_pretrained(
             config.name,
             trust_remote_code=True,
             torch_dtype=torch.float16,
-            device_map="auto"
+            low_cpu_mem_usage=True
         )
+        
+        # Move to GPU immediately
+        print("Moving model to CUDA...")
+        self.model = self.model.to('cuda:0')
+        
+        # Enable gradient checkpointing to save memory
+        if hasattr(self.model, 'gradient_checkpointing_enable'):
+            print("Enabling gradient checkpointing...")
+            self.model.gradient_checkpointing_enable()
         
         # Load processor
         self.processor = AutoProcessor.from_pretrained(
@@ -45,8 +55,8 @@ class BaseLLaVA(nn.Module):
             lora_config = LoraConfig(
                 r=config.lora.r,
                 lora_alpha=config.lora.alpha,
-                target_modules=["q_proj", "v_proj"],
-                lora_dropout=0.05,
+                target_modules="all-linear",
+                lora_dropout=0.0,
                 bias="none",
                 task_type="CAUSAL_LM"
             )
@@ -80,7 +90,10 @@ class BaseLLaVA(nn.Module):
             return_dict=True
         )
         
-        inputs = {k: v.to(self.model.device) for k, v in inputs.items()}
+        # Get model device - use first parameter's device since model.device might not exist
+        model_device = next(self.model.parameters()).device
+        
+        inputs = {k: v.to(model_device) for k, v in inputs.items()}
         
         with torch.amp.autocast('cuda'):
             outputs = self.model(
@@ -89,7 +102,8 @@ class BaseLLaVA(nn.Module):
                 return_dict=True
             )
         
-        return outputs.hidden_states[-1]
+        hidden_states = outputs.hidden_states[-1]
+        return hidden_states
     
     def generate(self, inputs_embeds=None, input_ids=None, attention_mask=None,
                  max_new_tokens=512, temperature=0.7, top_p=0.9):
