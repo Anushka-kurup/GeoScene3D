@@ -1,0 +1,24 @@
+[project]
+name = "geoscene3d"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "decord2>=3.0.0",
+    "einops>=0.8.1",
+    "molmo-utils>=0.0.1",
+    "omegaconf>=2.3.0",
+    "peft>=0.18.1",
+    "pillow>=12.1.0",
+    "pyyaml>=6.0.3",
+    "torch>=2.9.1",
+    "torchvision>=0.24.1",
+    "tqdm>=4.67.1",
+    "transformers>=4.57.6",
+    "wandb>=0.24.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.13",
+]
