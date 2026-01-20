@@ -1,0 +1,38 @@
+model:
+  vlm:
+    name: allenai/Molmo2-4B
+    token: null
+    freeze: true
+    lora:
+      enabled: true
+      r: 8
+      alpha: 16
+  geometry:
+    name: naver/DUSt3R_ViTLarge_BaseDecoder_512_linear
+    freeze: true
+    change_threshold: 0.1
+  fusion:
+    visual_dim: 2560
+    geometry_dim: 512
+    hidden_dim: 4096
+  verifier:
+    hidden_dim: 512
+  num_process_stages: 8
+  hidden_dim: 4096
+data:
+  replica_root: /workspace/GeoScene3D/data/replica_test
+  image_size: 224
+  temporal_gap_range:
+  - 5
+  - 20
+  include_depth: false
+training:
+  batch_size: 2
+  num_workers: 4
+  epochs: 50
+  learning_rate: 1e-4
+  weight_decay: 0.01
+  save_every: 5
+  checkpoint_dir: checkpoints
+  experiment_name: geocar_replica
+  use_wandb: false
