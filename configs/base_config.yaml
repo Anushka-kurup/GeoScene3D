@@ -1,7 +1,7 @@
 model:
   vlm:
-    name: "lmms-lab/LLaVA-NeXT-Video-7B"
-    token: "geocar"
+    name: "allenai/Molmo2-4B"
+    token: null
     freeze: true
     lora:
       enabled: true
