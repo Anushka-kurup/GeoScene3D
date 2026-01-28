@@ -7,6 +7,9 @@ cat >> .gitignore << 'EOF'
 
 # Virtual environments (you already have these but let's be explicit)
 3d-venv/
+venv/
+.venv/
+3d-venv-py39/
 
 # Large datasets (DON'T commit these!)
 Replica-Dataset/
